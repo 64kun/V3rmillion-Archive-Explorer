@@ -5,13 +5,16 @@ import os
 
 cmd_parser = argparse.ArgumentParser()
 
-cmd_parser.add_argument('path')
+cmd_parser.add_argument('path', help="path to v3rmillion folder")
 cmd_parser.add_argument('-r', required=True, help="threads search", nargs="+")
 cmd_parser.add_argument('-pages', type=int, default=1)
 
 cmd_args = cmd_parser.parse_args()
 
-def tonumber(v, default:int=None, Not=False):
+# Imitates the C function `tonumber` from Lua.
+# Supports a `Not` parameter that mirrors the behavior of Python's
+# `not` operator. It does not treat 0 as falsy.
+def tonumber(v, default:int=None, Not:bool=False):
     try:
         v = int(v)
         return False if Not else v
@@ -22,7 +25,7 @@ def tonumber(v, default:int=None, Not=False):
 FILE_PATH = cmd_args.path
 raw_requests = cmd_args.r
 REQUESTS = [
-    (raw_requests[i], tonumber(raw_requests[i+1] if i+1 < len(raw_requests) else None, default=10))
+    {raw_requests[i]: {0: tonumber(raw_requests[i+1] if i+1 < len(raw_requests) else None, default=10)}}
     for i in range(0, len(raw_requests)) if tonumber(raw_requests[i], Not=True)
 ]
 PAGES = cmd_args.pages
