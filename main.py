@@ -2,7 +2,7 @@ import json
 import argparse
 import os
 import re
-
+import operator
 
 def tc_parser(v):
     res = re.search(rf"""^tc="?'?([^"']+)"?'?$""", v)
@@ -26,7 +26,8 @@ cmd_parser.add_argument(
     help="""minimum pages for all threads (global). uses 2nd arg or a default value as max results if -r are empty.
     also have `tc` parameter, that uses only if -r are empty"""
 )
-cmd_parser.add_argument('-priority', choices=['request', 'pages'], default='request')
+cmd_parser.add_argument('-priority', choices=['request', 'pages', 'pages-proximity'], default='request')
+cmd_parser.add_argument('--ascending-sort', action="store_true")
 
 cmd_args = cmd_parser.parse_args()
 
@@ -84,6 +85,14 @@ def parser(r, title):
 
 checked = 0
 g = []
+
+OPS = {
+    '==': operator.eq,
+    '<=': operator.le,
+    '>=': operator.ge,
+    '<': operator.lt,
+    '>': operator.gt,
+}
 
 skip = False
 try:
