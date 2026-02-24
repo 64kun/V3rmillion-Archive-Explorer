@@ -47,15 +47,15 @@ print(FILE_PATH)
 raw_pages_data = cmd_args.p
 PAGES_DATA = {
     "found": 0,
-    "min_pages": int(raw_pages_data[0]),
-    "max": int(raw_pages_data[1]) if len(raw_pages_data) >= 2 else 10,
-    "target_condition": tc_parser(raw_pages_data[2]) or '*' if len(raw_pages_data) == 3 else '*'
+    "min_pages": raw_pages_data[0],
+    "max_results": raw_pages_data[1] if len(raw_pages_data) >= 2 else 10,
+    "target_condition": tc_parser(raw_pages_data[2]) if len(raw_pages_data) == 3 else None
 }
 raw_requests = cmd_args.r
 REQUESTS = [
     {raw_requests[i]: {
         "found": 0,
-        "max": tonumber(
+        "max_results": tonumber(
             raw_requests[i+1] if i+1 < len(raw_requests) else None,
             default=10
         ),
@@ -124,7 +124,7 @@ try:
 
         
         if not REQUESTS:
-            if PAGES_DATA["found"] == PAGES_DATA["max"]: break
+            if PAGES_DATA["found"] == PAGES_DATA["max_results"]: break
             if not OPS.get(PAGES_DATA["target_condition"], default_OPS_predicate)(pages_len, PAGES_DATA["min_pages"]):
                 continue
             PAGES_DATA["found"] += 1
