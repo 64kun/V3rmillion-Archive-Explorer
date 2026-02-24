@@ -32,14 +32,14 @@ cmd_parser.add_argument('--ascending-sort', action="store_true")
 cmd_args = cmd_parser.parse_args()
 
 # Imitates the C function `tonumber` from Lua.
-# Supports a `Not` parameter that mirrors the behavior of Python's
-# `not` operator. It does not treat 0 as falsy.
-def tonumber(v, default:int=None, Not:bool=False):
+# Supports a `not_is` and `Is` parameters that mirrors the behavior of Python's
+# `not` & `and` operators. It does not treat 0 as falsy.
+def tonumber(v, default:int=None, not_is:bool=False, Is:bool=False):
     try:
         v = int(v)
-        return False if Not else v
+        return False if not_is else (v if not Is else True)
     except (ValueError, TypeError):
-        return default if not Not else True
+        return (default if not Is else False) if not not_is else True
 
 
 FILE_PATH = cmd_args.path
@@ -63,16 +63,17 @@ REQUESTS = [
             raw_requests[i+2] if (i+2 < len(raw_requests) and tonumber(
                 # safeguard to prevent unintentional utilization of parameters from another request
                 raw_requests[i+1],
+                Is=True
             )) else None,
             default=1
         ),
-        "target_condition": tc_parser(raw_requests[i+3]) or '*' if (
+        "target_condition": tc_parser(raw_requests[i+3]) if (
             i+3 < len(raw_requests) and
-            tonumber(raw_requests[i+1]) and
-            tonumber(raw_requests[i+2])
-        ) else '*'
+            tonumber(raw_requests[i+1], Is=True) and
+            tonumber(raw_requests[i+2], Is=True)
+        ) else None
     }}
-    for i in range(0, len(raw_requests)) if tonumber(raw_requests[i], Not=True) and not tc_parser(raw_requests[i])
+    for i in range(0, len(raw_requests)) if tonumber(raw_requests[i], not_is=True) and not tc_parser(raw_requests[i])
 ]
 
 print(REQUESTS)
@@ -88,11 +89,16 @@ g = []
 
 OPS = {
     '==': operator.eq,
+    '!=': operator.ne,
     '<=': operator.le,
     '>=': operator.ge,
     '<': operator.lt,
     '>': operator.gt,
 }
+
+def default_OPS_predicate(a, b):
+    return True
+
 
 skip = False
 try:
@@ -105,24 +111,21 @@ try:
         thread_data = os.listdir(full_path)
         
         pages = [os.path.join(full_path, f) for f in thread_data if f.endswith('.html')]
-        
+        pages_len = len(pages)
 
-        if len(pages) < PAGES_DATA["min_pages"]: continue
+        if pages_len < PAGES_DATA["min_pages"]: continue
         
         for data in REQUESTS:
             req, params = next(iter(data.items()))
-            if params["target_condition"] == '*':
-                pass
-            elif params["target_condition"] == '<=' and len(pages) > params["threshold"]:
-                continue
-            elif params["target_condition"] == '==' and len(pages) != params["threshold"]:
+            #  |  | 
+            if not OPS.get(params["target_condition"], default_OPS_predicate)(pages_len, params["threshold"]):
                 continue
             # The rest of the code will be here
 
         
         if not REQUESTS:
             if PAGES_DATA["found"] == PAGES_DATA["max"]: break
-            if PAGES_DATA["target_condition"] == '==' and len(pages) != PAGES_DATA["min_pages"]:
+            if not OPS.get(PAGES_DATA["target_condition"], default_OPS_predicate)(pages_len, PAGES_DATA["min_pages"]):
                 continue
             PAGES_DATA["found"] += 1
             print(full_path)
