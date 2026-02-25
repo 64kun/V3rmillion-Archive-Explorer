@@ -3,10 +3,12 @@ import argparse
 import os
 import re
 import operator
+import time
 
 def tc_parser(v):
-    res = re.search(rf"""^tc="?'?([^"']+)"?'?$""", v)
-    return res.group(1) if res else None
+    res = re.search(r"""^tc="?'?(\W+)(\d+)"?'?$""", v)
+    return (res.group(1), int(res.group(2))) if res else None
+
 
 def p_flag_type(v):
     try:
@@ -51,6 +53,7 @@ PAGES_DATA = {
     "max_results": raw_pages_data[1] if len(raw_pages_data) >= 2 else 10,
     "target_condition": tc_parser(raw_pages_data[2]) if len(raw_pages_data) == 3 else None
 }
+print(PAGES_DATA)
 raw_requests = cmd_args.r
 REQUESTS = [
     {raw_requests[i]: {
@@ -59,19 +62,10 @@ REQUESTS = [
             raw_requests[i+1] if i+1 < len(raw_requests) else None,
             default=10
         ),
-        "threshold": tonumber(
-            raw_requests[i+2] if (i+2 < len(raw_requests) and tonumber(
-                # safeguard to prevent unintentional utilization of parameters from another request
-                raw_requests[i+1],
-                Is=True
-            )) else None,
-            default=1
-        ),
-        "target_condition": tc_parser(raw_requests[i+3]) if (
-            i+3 < len(raw_requests) and
-            tonumber(raw_requests[i+1], Is=True) and
-            tonumber(raw_requests[i+2], Is=True)
-        ) else None
+        "target_condition": tc_parser(raw_requests[i+2]) or (None, 1) if (
+            i+2 < len(raw_requests) and
+            tonumber(raw_requests[i+1], Is=True)
+        ) else (None, 1)
     }}
     for i in range(0, len(raw_requests)) if tonumber(raw_requests[i], not_is=True) and not tc_parser(raw_requests[i])
 ]
@@ -117,15 +111,17 @@ try:
         
         for data in REQUESTS:
             req, params = next(iter(data.items()))
-            #  |  | 
-            if not OPS.get(params["target_condition"], default_OPS_predicate)(pages_len, params["threshold"]):
+            target_condition, threshold = params["target_condition"]
+            if not OPS.get(target_condition, default_OPS_predicate)(pages_len, threshold):
                 continue
+            time.sleep(0.01)
+            print("found")
             # The rest of the code will be here
-
         
         if not REQUESTS:
             if PAGES_DATA["found"] == PAGES_DATA["max_results"]: break
-            if not OPS.get(PAGES_DATA["target_condition"], default_OPS_predicate)(pages_len, PAGES_DATA["min_pages"]):
+            target_condition, threshold = PAGES_DATA["target_condition"]
+            if not OPS.get(target_condition, default_OPS_predicate)(pages_len, threshold):
                 continue
             PAGES_DATA["found"] += 1
             print(full_path)
