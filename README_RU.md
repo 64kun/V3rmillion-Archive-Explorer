@@ -35,17 +35,17 @@ cd V3rmillion-Archive-Explorer
 
 Простой пример использования:
 ```sh
-python main.py путь-к-архиву-v3rmillion -r "request 1"
+python main.py путь-к-папке-с-тредами-архива-v3rmillion -r "request 1"
 ```
 
 Вы можете указать максимальное количество результатов (если не укажете, то будет установлено значение по умолчанию: 10):
 ```sh
-python main.py путь-к-архиву-v3rmillion -r "request 1" 20
+python main.py путь-к-папке-с-тредами-архива-v3rmillion -r "request 1" 20
 ```
 
 Также можно искать сразу по нескольким запросам:
 ```sh
-python main.py путь-к-архиву-v3rmillion -r "request 1" "request 2" 15 "request 3" 5
+python main.py путь-к-папке-с-тредами-архива-v3rmillion -r "request 1" "request 2" 15 "request 3" 5
 ```
 
 После выполнения скрипта все результаты сохранятся в папку `parsed/` в проекте.

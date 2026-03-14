@@ -35,17 +35,17 @@ cd V3rmillion-Archive-Explorer
 
 Simple usage example:
 ```sh
-python main.py path-to-v3rmillion-archive -r "request 1"
+python main.py path-to-v3rmillion-archive-threads-folder -r "request 1"
 ```
 
 You can specify the maximum number of results (default value is 10):
 ```sh
-python main.py path-to-v3rmillion-archive -r "request 1" 20
+python main.py path-to-v3rmillion-archive-threads-folder -r "request 1" 20
 ```
 
 You can also search using multiple requests at once:
 ```sh
-python main.py path-to-v3rmillion-archive -r "request 1" "request 2" 15 "request 3" 5
+python main.py path-to-v3rmillion-archive-threads-folder -r "request 1" "request 2" 15 "request 3" 5
 ```
 
 After execution, all results will be saved into the `parsed/` folder inside the project.
