@@ -1,12 +1,17 @@
 import re, json, os
 from thread_parser import thread_parser
 from math import log
+from index_manager import ensure_index
+
 
 WORDS_RE = re.compile(r"\w+")
 # FILE_PATH = r"C:\Absolute_Everything\v3rmillion-archive\v3rmillion\threads"
 
 def get_words_list(s):
     return WORDS_RE.findall(s) if s else []
+
+
+ensure_index()
 
 with open('index/index.json', 'r', encoding='utf-8') as f:
     index: dict = json.load(f)
