@@ -23,3 +23,9 @@ Thumbs.db
 
 # SQLite
 *.sqlite3
+
+docs.md
+index/
+*.index
+*.bin
+*.zip
