@@ -127,7 +127,7 @@ class Thread(TypedDict):
 
 
 def thread_parser(folder_path) -> Thread:
-    print(f"parsing {folder_path}...")
+    print(f"Parsing thread {folder_path}...")
     pages = sorted([f for f in os.listdir(folder_path) if f.endswith('.html')], key=sortpages)
 
     thread_tree = {'title': None, 'thread_content': None, 'replies_to_not_found_posts': []}

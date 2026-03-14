@@ -72,7 +72,7 @@ REQUESTS = [
     for i in range(0, len(raw_requests)) if tonumber(raw_requests[i], not_is=True) #and not tc_parser(raw_requests[i])
 ]
 
-print(REQUESTS)
+# print(REQUESTS)
 # threads = os.listdir(FILE_PATH)
 
 # OPS = {
@@ -128,7 +128,7 @@ def main():
             with open(path_to_save, 'w', encoding='utf-8') as f:
                 json.dump(thread, f, ensure_ascii=False, indent=4)
 
-            print(f'saved {path_to_save}')
+            print(f'Saved thread {id} to {path_to_save}')
 
 
 main()
