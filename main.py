@@ -120,7 +120,7 @@ def main():
         req_folder = os.path.join('parsed', '-'.join(get_words_list(req)))
 
         if not os.path.exists(req_folder):
-            os.mkdir(req_folder)
+            os.makedirs(req_folder, exist_ok=True)
         
         for i, (id, thread) in enumerate(zip(thread_ids, results), start=1):
             path_to_save = os.path.join(req_folder, f'{i}_parsed-thread_{id}.json')
