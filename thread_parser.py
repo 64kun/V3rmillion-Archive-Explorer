@@ -135,7 +135,7 @@ class Thread(TypedDict):
     replies_to_not_found_posts: List[Post]
 
 
-def thread_parser(folder_path) -> Thread:
+def thread_parser(folder_path, save_after_parse=False) -> Thread:
     print(f"Parsing thread {folder_path}...")
     pages = sorted([f for f in os.listdir(folder_path) if f.endswith('.html')], key=sortpages)
 
@@ -192,4 +192,13 @@ def thread_parser(folder_path) -> Thread:
         # print(list(posts_pos.keys()))
         got_thread_content_info = True
     
+    if save_after_parse:
+        _, thread_id = os.path.split(folder_path)
+        path_to_save = f'parsed/parsed_thread_{thread_id}'
+        
+        with open(path_to_save, 'w', encoding='utf-8') as f:
+            json.dump(thread_tree, f, ensure_ascii=False, indent=4)
+
+        print(f"Parsed thread saved to {path_to_save}")
+
     return thread_tree
