@@ -27,7 +27,10 @@ def get_text_start(text, p=0.08):
     # return re.search(words_count_pattern, text).group()
     return text[:round(len(text) * p + 1)]
 
-def get_post_information(post: Tag):
+def get_post_information(post: Tag, page: Tag, debug=False, i=None):
+    if debug:
+        print(f"Parsing {i} post\nPost:\n{post}")
+
     post_date_element = post.select_one(".post_date")
     post_date = get_only_el_text(post_date_element, strip=True)
 
@@ -36,7 +39,11 @@ def get_post_information(post: Tag):
 
     post_content_element = post.select_one('.post_content')
     
-    like_buttons_element = post_content_element.find(attrs={'id': LIKE_BUTTONS_RE}) or post.find(attrs={'id': LIKE_BUTTONS_RE})
+    like_buttons_element = (
+        post_content_element.find(attrs={'id': LIKE_BUTTONS_RE}) or
+        post.find(attrs={'id': LIKE_BUTTONS_RE}) or
+        page.find_all(attrs={'id': LIKE_BUTTONS_RE})[i]
+    )
 
     likes = like_buttons_element.select_one('.fa.fa-thumbs-o-up').parent.parent.get_text(strip=True)
     dislikes = like_buttons_element.select_one('.fa.fa-thumbs-o-down').parent.parent.get_text(strip=True)
@@ -135,7 +142,7 @@ class Thread(TypedDict):
     replies_to_not_found_posts: List[Post]
 
 
-def thread_parser(folder_path, save_after_parse=False) -> Thread:
+def thread_parser(folder_path, debug=False, save_after_parse=False, path_to_save='') -> Thread:
     print(f"Parsing thread {folder_path}...")
     pages = sorted([f for f in os.listdir(folder_path) if f.endswith('.html')], key=sortpages)
 
@@ -159,7 +166,7 @@ def thread_parser(folder_path, save_after_parse=False) -> Thread:
             thread_tree['title'] = title
             # print(title)
 
-            _, thread_content_info = get_post_information(posts[0])
+            _, thread_content_info = get_post_information(posts[0], soup, debug=debug, i=0)
             
             post_date, author_username, post_description_start = thread_content_info['post_date'], thread_content_info['author_username'], thread_content_info['post_description_start']
             posts_pos[(post_date, author_username)] = thread_content_info
@@ -169,7 +176,7 @@ def thread_parser(folder_path, save_after_parse=False) -> Thread:
 
 
         for i in range(int(not got_thread_content_info), len(posts)):
-            blockquote_element_text, post_info =  get_post_information(posts[i])
+            blockquote_element_text, post_info =  get_post_information(posts[i], soup, debug=debug, i=i)
             
             post_date, author_username, post_description_start = post_info['post_date'], post_info['author_username'], post_info['post_description_start']
             posts_pos[(post_date, author_username)] = post_info
@@ -193,9 +200,10 @@ def thread_parser(folder_path, save_after_parse=False) -> Thread:
         got_thread_content_info = True
     
     if save_after_parse:
-        _, thread_id = os.path.split(folder_path)
-        path_to_save = f'parsed/parsed_thread_{thread_id}'
-        
+        if not path_to_save:
+            _, thread_id = os.path.split(folder_path)
+            path_to_save = os.path.join('parsed', f'parsed_thread_{thread_id}')
+
         with open(path_to_save, 'w', encoding='utf-8') as f:
             json.dump(thread_tree, f, ensure_ascii=False, indent=4)
 

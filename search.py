@@ -16,7 +16,7 @@ ensure_index()
 with open('index/index.json', 'r', encoding='utf-8') as f:
     index: dict = json.load(f)
 
-def search(req, max_results, path):
+def search(req, max_results, path, debug=False):
     req_words = get_words_list(req)
     scores = {}
 
@@ -32,7 +32,7 @@ def search(req, max_results, path):
     results = sorted(scores, key=scores.get, reverse=True)
     results = len(results) >= max_results and results[:max_results] or results
     
-    return (results, [thread_parser(os.path.join(path, r)) for r in results])
+    return (results, [thread_parser(os.path.join(path, r), debug=debug) for r in results])
 
     
 

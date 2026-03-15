@@ -25,6 +25,7 @@ cmd_parser = argparse.ArgumentParser()
 
 cmd_parser.add_argument('path', help="path to v3rmillion folder")
 cmd_parser.add_argument('-r', help="threads search", default=[], nargs='*')
+cmd_parser.add_argument('-d', action='store_true', help='debug')
 # cmd_parser.add_argument(
 #     '-p', type=p_flag_type, required=True, nargs="+",
 #     help="""minimum pages for all threads (global). uses 2nd arg or a default value as max results if -r are empty.
@@ -47,6 +48,7 @@ def tonumber(v, default:int=None, not_is:bool=False, Is:bool=False):
 
 
 FILE_PATH = cmd_args.path
+DEBUG = cmd_args.d
 # print(FILE_PATH)
 # raw_pages_data = cmd_args.p
 # PAGES_DATA = {
@@ -113,7 +115,7 @@ def main():
 
         max_results = params['max_results']
 
-        thread_ids, results = search(req, max_results, FILE_PATH)
+        thread_ids, results = search(req, max_results, FILE_PATH, debug=DEBUG)
         if not results:
             continue
         
