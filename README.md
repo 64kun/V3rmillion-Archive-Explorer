@@ -48,6 +48,12 @@ You can also search using multiple requests at once:
 python main.py path-to-v3rmillion-archive-threads-folder -r "request 1" "request 2" 15 "request 3" 5
 ```
 
+If you need to parse and save a single thread or multiple threads, use parse_thread.py:
+```sh
+python parse_thread.py path-to-thread-folder_1 path-to-thread-folder_2
+```
+
+
 After execution, all results will be saved into the `parsed/` folder inside the project.
 
 *Currently only saving threads in JSON format is supported. Generating custom HTML pages is planned, but it is unknown when i will have time to implement it.*
