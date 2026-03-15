@@ -121,6 +121,7 @@ class Post(TypedDict):
 
 
 class Thread(TypedDict):
+    thread_path: str
     title: str
     thread_content: Post
     replies_to_not_found_posts: List[Post]
@@ -130,7 +131,8 @@ def thread_parser(folder_path) -> Thread:
     print(f"Parsing thread {folder_path}...")
     pages = sorted([f for f in os.listdir(folder_path) if f.endswith('.html')], key=sortpages)
 
-    thread_tree = {'title': None, 'thread_content': None, 'replies_to_not_found_posts': []}
+    thread_tree = {'thread_path': folder_path, 'title': None,
+                   'thread_content': None, 'replies_to_not_found_posts': []}
     posts_pos = dict()
     
     got_thread_content_info = False
