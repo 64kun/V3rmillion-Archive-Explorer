@@ -1,5 +1,4 @@
 import re, json, os
-from thread_parser import thread_parser
 from math import log
 from index_manager import ensure_index
 
@@ -16,7 +15,7 @@ ensure_index()
 with open('index/index.json', 'r', encoding='utf-8') as f:
     index: dict = json.load(f)
 
-def search(req, max_results, path, debug=False):
+def search(req, max_results):
     req_words = get_words_list(req)
     scores = {}
 
@@ -32,7 +31,7 @@ def search(req, max_results, path, debug=False):
     results = sorted(scores, key=scores.get, reverse=True)
     results = len(results) >= max_results and results[:max_results] or results
     
-    return (results, [thread_parser(os.path.join(path, r), debug=debug) for r in results])
+    return results
 
     
 

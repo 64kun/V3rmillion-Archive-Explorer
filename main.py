@@ -6,6 +6,7 @@ import operator
 import time
 from collections import Counter
 from search import search, get_words_list
+from thread_parser import thread_parser
 
 # def tc_parser(v):
 #     res = re.search(r"""^tc="?'?(\W+)(\d+)"?'?$""", v)
@@ -115,16 +116,18 @@ def main():
 
         max_results = params['max_results']
 
-        thread_ids, results = search(req, max_results, FILE_PATH, debug=DEBUG)
-        if not results:
+        result_ids = search(req, max_results)
+        if not result_ids:
             continue
         
+        threads = [thread_parser(os.path.join(FILE_PATH, r), debug=DEBUG) for r in result_ids]
+
         req_folder = os.path.join('parsed', '-'.join(get_words_list(req)))
 
         if not os.path.exists(req_folder):
             os.makedirs(req_folder, exist_ok=True)
         
-        for i, (id, thread) in enumerate(zip(thread_ids, results), start=1):
+        for i, (id, thread) in enumerate(zip(result_ids, threads), start=1):
             path_to_save = os.path.join(req_folder, f'{i}_parsed-thread_{id}.json')
 
             with open(path_to_save, 'w', encoding='utf-8') as f:
