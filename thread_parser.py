@@ -1,4 +1,4 @@
-import re, os
+import re, os, json
 from bs4 import BeautifulSoup, NavigableString, Tag
 from typing import TypedDict, List
 
@@ -42,6 +42,14 @@ def get_post_information(post: Tag):
     dislikes = like_buttons_element.select_one('.fa.fa-thumbs-o-down').parent.parent.get_text(strip=True)
 
     post_body_element = post_content_element.select_one('.post_body.scaleimages')
+    links = post_body_element.select('a[href]')
+    images = post_body_element.select('img[src]')
+    
+    for link_element in links:
+        link_element.replace_with(link_element.get('href'))
+
+    for image_element in images:
+        image_element.replace_with(image_element.get('src'))
 
     author_username = post_body_element.get('data-username')
     author_id = post_body_element.get('id')
