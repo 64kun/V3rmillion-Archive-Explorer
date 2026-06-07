@@ -84,7 +84,11 @@ def get_post_information(post: Tag, page_content: Tag, debug=False, page=None, i
         
         cite_element = blockquote_element.find('cite')
 
-        replied_to = REPLIED_TO_RE.search(get_only_el_text(cite_element, strip=True)).group(1)
+        match = REPLIED_TO_RE.search(get_only_el_text(cite_element, strip=True))
+        if match:
+            replied_to = match.group(1)
+        else:
+            replied_to = None
         
         replied_to_message_date = REPLIED_TO_MESSAGE_DATE_RE.search(cite_element.find('span').get_text(strip=True)).group()
         
